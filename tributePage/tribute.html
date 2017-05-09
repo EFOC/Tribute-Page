@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/bootstrap.min.css.map">
+        <script src="js/bootstrap.js"></script>
+        <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+        <script>
+           
+            /////////////////////////////////////////
+            // FUNCTIONS START HERE
+            ///////////////////////////////////////
+            
+            
+            //Validate Year
+            function yearValidate(id){
+                var valid = true;
+                if($(id).next().hasClass("error")){
+                    $(id).next().remove();
+                }
+                if(!$(id).val()){
+                    emptyBox(id);
+                    errorBox(id);
+                    $(id).focus();
+                    valid = false;
+                }else if($(id).val() < 1914 || $(id).val().length !== 4){
+                    errorBox(id);
+                    $(id).focus();
+                    $("#year").after("<p class='text-center error'>Error, year can not be before 1914 </p>");
+                    valid = false;
+                }else{
+                    validBox(id);
+                }
+                return valid;
+            } //End of Year Validation
+                
+            
+            //Validate Description
+            function descriptionValidate(){
+                var valid = true;
+                var description = $("#description").val();
+                if($("#description").next().hasClass("error")){
+                    $("#description").next().remove();
+                }
+                description = $.trim(description);
+                if(description.length == 0){
+                    emptyBox("#description");
+                    errorBox("#description");
+                    $("#description").val("");
+                    valid = false;
+                }else if(description.length < 5){
+                    $("#description").after("<p class='text-center error'>Error, can not be less than 5 characters </p>");
+                    errorBox("#description");
+                    valid = false;
+                }else{
+                    validBox("#description");
+                }
+                return valid;
+            } //End of Description Validation
+
+            //checks if its empty
+            function emptyBox(name){
+                //makes sure to only put one error message
+                if(!$(name).next().hasClass("error")){
+                    $(name).after("<p class='text-center error'>Error, can not be empty! </p>");
+                    $(name).focus();
+                }
+            }
+            //Function that changes the color of the input box if error
+            function errorBox(name){
+                 $(name).css({
+                    border: "2px solid red"
+                });
+            }
+            //Takes away error box
+            function validBox(name){
+                $(name).css('border', '');
+            }
+            
+            ////////////////////////////
+            //ON READY DOCUMENT FUNCTION STARTS HERE
+            ////////////////////////////
+            
+            $(document).ready(function(){
+                
+                //Here Are The Keys I Want To Use For My Next Function Coming Up
+                var backspaceKey = String.fromCharCode(8);
+                var tabKey = String.fromCharCode(9);
+                var enterKey = String.fromCharCode(13);
+                var spaceBarKey = String.fromCharCode(32);
+                
+                //This Function Validates The User's Input
+                //To And Prints Specific Keys Only
+                $("#year").on('keydown', function(e){
+                    var year = $("#year").val();
+                    var charval = String.fromCharCode(e.keyCode);
+                    var valid = false;
+                    
+                    if(		(!isNaN(charval) && (year.length < 4) ||
+                            charval == backspaceKey ||
+                            charval == tabKey ||
+                            charval == enterKey) &&
+                            charval != spaceBarKey
+                            ){
+                       return true;
+                    }
+                    return valid;
+                });
+                
+                
+                //OnChange Year Function
+                $("#year").on('change',function(){
+                    yearValidate("#year");
+                });
+                
+                //OnChange Description Function
+                $("#description").on('change', function(){
+                    descriptionValidate();
+                });
+                
+                //OnClick Final Validation
+                $("#submit").click(function(){
+                    if(yearValidate("#year") && descriptionValidate()){
+                        
+                        var year = $("#year").val();
+                        var description = $("#description").val();
+                        $("li:last").after('<li class="new"><strong>' + year + ' -</strong> ' + description +'</li>');
+                        return false;
+                    }else{
+                        return false;
+                    }
+                });
+                
+                //Delete Function Button
+                $("#delete").on('click', function(){
+                    $(".new").remove();
+                    return false;
+                })
+                
+            }); //Document Ready function ends here
+            
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="container-fluid jumbotron">
+                <h1 class="text-center">Dr. Norman Borlaug</h1>
+                <h3 class="text-center">The man who saved a billion lives</h3>
+                <div class="row">
+                    <div class="col-*-12">
+                        <figure class="figure">
+                            <img src="images/cropfield.jpg" class="figure-img img-responsive center-block img-rounded" alt="a crop field"/> 
+                            
+                            <figcaption class="figure-caption text-center">Dr. Norman Borlaug, third from left, trains biologists in Mexico on how to increase wheat yields - part of his life-long war on hunger.</figcaption>
+                        </figure>
+                    </div>
+                </div>
+                <div class="container">
+                    <h4>Here's a time line of Dr. Borlaug's life:</h4>
+                    <ul>
+                        <li><strong>1914 -</strong> Born in Cresco, Iowa</li>
+                    </ul>
+                    <blockquote class="blockquote">"Borlaug's life and achievement are testimony to the far-reaching contribution that one man's towering intellect, persistence and scientific vision can make to human peace and progress."
+                    <footer class="blockquote-footer">Indian Prime Minister Manmohan Singh</footer>
+                    </blockquote>
+                    <p>If you have time, you should read more about this incredible human being on his <a href="https://en.wikipedia.org/wiki/Norman_Borlaug" target="_blank">Wikipedia entry</a>.</p>
+                </div>
+            </div>
+            <form>
+                <h4>Add Another Event to the Time Line</h4>
+                <div class="form-group">
+                    <label for="year">Year</label>
+                    <input type="text" class="form-control year" id="year" placeholder="Enter the Year of Event" max="9999" onchange="year()">
+                    
+                    <br>
+                    <lable for="description">Description</lable>
+                    <textarea id="description" class="form-control" placeholder="Describe the Event"></textarea>
+                    <br>
+                    <button class="btn btn-default" id="submit">Add Event</button>
+                    <button class="btn btn-default" id="delete">Delete Newly Added Events</button>
+                </div>
+            </form>
+        </div>
+    </body>
+</html>
